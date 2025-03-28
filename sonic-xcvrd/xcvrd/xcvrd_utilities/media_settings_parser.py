@@ -25,6 +25,7 @@ LANE_SPEED_DEFAULT_KEY = LANE_SPEED_KEY_PREFIX + DEFAULT_KEY
 SYSLOG_IDENTIFIER = "xcvrd"
 helper_logger = logger.Logger(SYSLOG_IDENTIFIER)
 
+PHYSICAL_PORT_NOT_EXIST = -1
 
 def load_media_settings():
     global g_dict
