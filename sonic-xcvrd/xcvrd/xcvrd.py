@@ -370,7 +370,27 @@ def _wrapper_is_copper(physical_port):
 
     return None
 
+# Refresh the sfp_type according to the Identifier field in eeprom when sfp is inserted
+def _wrapper_update_sfp_type(physical_port):
+    if platform_chassis:
+        try:
+            platform_chassis.get_sfp(physical_port).update_sfp_type()
+        except:
+            pass
 
+# Refresh the xcvr_api according to the Identifier field in eeprom when sfp is inserted
+def _wrapper_refresh_xcvr_api(physical_port):
+    if platform_chassis:
+        try:
+            sfp = platform_chassis.get_sfp(physical_port)
+        except (NotImplementedError, AttributeError):
+            return None
+
+        if hasattr(sfp, 'refresh_xcvr_api') == True:
+            try:
+                sfp.refresh_xcvr_api()
+            except:
+                pass
 
 # The API name aligns with the platform API implementation (sfp.set_sfp_mux).
 # It may need to be revised to ensure compatibility for broader usage.
@@ -2161,6 +2181,8 @@ class SfpStateUpdateTask(threading.Thread):
                                 continue
 
                             if value == sfp_status_helper.SFP_STATUS_INSERTED:
+                                _wrapper_update_sfp_type(key)
+                                _wrapper_refresh_xcvr_api(key)
                                 helper_logger.log_notice("{}: Got SFP inserted event".format(logical_port))
                                 # A plugin event will clear the error state.
                                 update_port_transceiver_status_table_sw(
